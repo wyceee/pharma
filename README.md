@@ -7,19 +7,7 @@ This project implements a blockchain-based supply chain solution for pharmacies 
 ## 📁 Project Structure
 
 ```
-pharma/
-├── backend/
-│   ├── package.json
-│   └── src/
-│       ├── app.js
-│       ├── enrolladmin.js
-│       ├── eventHandler.js
-│       └── fabric/
-│           └── network.js
-├── contract/
-│   ├── package.json
-│   └── index.js
-└── README.md
+soon
 ```
 
 ---
@@ -78,26 +66,23 @@ pharma/
 
 4. **deploy the hyperledger network**:
     ```bash
+    # 1️⃣ Bring up the network and create the channel
     cd fabric-samples/test-network
-    # Bring up the network with 2 orgs
     ./network.sh up createChannel -c pharmachannel -ca
-    # Add Org3 (Manufacturer)
+    
+    # 2️⃣ Add additional organizations
     ./addOrg3.sh --orgName Manufacturer --orgDomain manufacturer.example.com
-    # Add Org4 (QualityControl)
-    ./addOrg3.sh --orgName QualityControl --orgDomain qualitycontrol.example.com
-    # Add Org5 (Distributor)
     ./addOrg3.sh --orgName Distributor --orgDomain distributor.example.com
-    # Add Org6 (Pharmacy)
     ./addOrg3.sh --orgName Pharmacy --orgDomain pharmacy.example.com
-    # Deploy chaincode (make sure all peers are specified as endorsers)
-    ./network.sh deployCC -ccn acc-mgmt -ccp ../../chaincode -ccv 1 -ccl javascript -c pharmachannel
-    cd ../../backend
-    # Add/register users for each organization
-    node Manufacturer.js      # Register user for Manufacturer org
-    node QualityControl.js    # Register user for QualityControl org
-    node Distributor.js       # Register user for Distributor org
-    node Pharmacy.js          # Register user for Pharmacy org
-    node Customer.js          # Register customer (can be in any org or a default one)
+    
+    # 3️⃣ Deploy the chaincode
+    ./network.sh deployCC -ccn pharma -ccp ../../contract -ccl javascript -c pharmachannel -ccv 1
+    
+    # 4️⃣ Register users for each organization
+    cd ../../backend/node
+    node manufacturer.js
+    node distributor.js
+    node pharmacy.js
     ```
 
 5. **Start the hyperledger network after stopped**:
@@ -110,8 +95,8 @@ pharma/
 
 ## 👥 Authors
 
-- YC
-- OM
+- Yusuf Çalik
+- Orhan Işık
 
 ---
 

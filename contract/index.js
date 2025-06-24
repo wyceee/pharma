@@ -1,5 +1,5 @@
-'use script';
+'use strict';
 
-const PharmaContract = require('');
+const pharmaContract = require('./pharmaContract');
 
-module.exports.contracts = [];
+module.exports.contracts = [pharmaContract];
