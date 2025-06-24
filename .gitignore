@@ -6,6 +6,9 @@ contract/node_modules/
 # Logs
 *.log
 
+# Build output
+.idea
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -20,4 +23,3 @@ fabric-samples/
 install-fabric.sh
 package-lock.json
 graphql-settings.xml
-.idea
