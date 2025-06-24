@@ -17,3 +17,5 @@ contract/.env
 
 # Ignore Hyperledger Fabric samples directory
 fabric-samples/
+install-fabric.sh
+package-lock.json
