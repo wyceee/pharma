@@ -108,3 +108,79 @@ export async function inspectRecords(identityName, batchNumber, pharmacy, inspec
         await gateway.disconnect();
     }
 }
+
+// Utility: Build CA Client from a Connection Profile
+export async function buildCAClient(ccpPath, caHostName) {
+    const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+    const caInfo = ccp.certificateAuthorities[caHostName];
+    return new FabricCAServices(
+        caInfo.url,
+        {
+            trustedRoots: caInfo.tlsCACerts.pem,
+            verify: false,
+        },
+        caInfo.caName
+    );
+}
+
+// Utility: Register and Enroll User
+export async function registerAndEnrollUser(caClient, wallet, orgMspId, userId, affiliation, adminUserId = 'admin', adminSecret = 'adminpw') {
+    // 1️⃣ Check if user already exists
+    const userIdentity = await wallet.get(userId);
+    if (userIdentity) {
+        console.log(`ℹ️ User ${userId} already exists in the wallet`);
+        return;
+    }
+
+    // 2️⃣ Check if the Admin already exists
+    let adminIdentity = await wallet.get(adminUserId);
+    if (!adminIdentity) {
+        console.log(`ℹ️ Admin user ${adminUserId} not found in the wallet. Enrolling now...`);
+        const enrollment = await caClient.enroll({
+            enrollmentID: adminUserId,
+            enrollmentSecret: adminSecret,
+        });
+        adminIdentity = {
+            credentials: {
+                certificate: enrollment.certificate,
+                privateKey: enrollment.key.toBytes(),
+            },
+            mspId: orgMspId,
+            type: 'X.509',
+        };
+        await wallet.put(adminUserId, adminIdentity);
+    }
+
+    // 3️⃣ Get Admin User Context
+    const provider = wallet.getProviderRegistry().getProvider('X.509');
+    const adminUser = await provider.getUserContext(adminIdentity, adminUserId);
+
+    // 4️⃣ Register the New User
+    const secret = await caClient.register({
+        affiliation,
+        enrollmentID: userId,
+        role: 'client',
+    }, adminUser);
+
+    // 5️⃣ Enroll New User
+    const userEnrollment = await caClient.enroll({
+        enrollmentID: userId,
+        enrollmentSecret: secret,
+    });
+    const userIdentityData = {
+        credentials: {
+            certificate: userEnrollment.certificate,
+            privateKey: userEnrollment.key.toBytes(),
+        },
+        mspId: orgMspId,
+        type: 'X.509',
+    };
+    await wallet.put(userId, userIdentityData);
+
+    console.log(`✅ Successfully registered and enrolled user "${userId}" and imported it into the wallet`);
+}
+
+// Utility: Build a new wallet for storing identities
+export async function buildWallet(walletPath) {
+    return await Wallets.newFileSystemWallet(walletPath);
+}

@@ -5,8 +5,8 @@ const { Contract } = require('fabric-contract-api');
 class PharmaContract extends Contract {
     async createProduct(ctx, batchNumber, ingredients, manufacturer, manufactureDate, expiryDate) {
         const mspId = ctx.clientIdentity.getMSPID();
-        if (mspId !== 'ManufacturerMSP') {
-            throw new Error('Only a manufacturer can create a product');
+        if (mspId !== 'Org1MSP') {
+            throw new Error('Only Org1MSP (manufacturer) can create a product');
         }
         const product = {
             batchNumber,
@@ -23,8 +23,8 @@ class PharmaContract extends Contract {
 
     async shipProduct(ctx, batchNumber, distributor, temperatureChecks, shipDate) {
         const mspId = ctx.clientIdentity.getMSPID();
-        if (mspId !== 'DistributorMSP') {
-            throw new Error('Only a distributor can ship a product');
+        if (mspId !== 'Org2MSP') {
+            throw new Error('Only Org2MSP (distributor) can ship a product');
         }
         const productBytes = await ctx.stub.getState(batchNumber);
         if (!productBytes || productBytes.length === 0) {
@@ -41,10 +41,6 @@ class PharmaContract extends Contract {
     }
 
     async inspectRecords(ctx, batchNumber, pharmacy, inspectionDate, remarks) {
-        const mspId = ctx.clientIdentity.getMSPID();
-        if (mspId !== 'PharmacyMSP') {
-            throw new Error('Only a pharmacy can inspect product records');
-        }
         const productBytes = await ctx.stub.getState(batchNumber);
         if (!productBytes || productBytes.length === 0) {
             throw new Error(`Product with batch number ${batchNumber} does not exist`);

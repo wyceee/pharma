@@ -66,29 +66,33 @@ soon
 
 4. **deploy the hyperledger network**:
     ```bash
-    # 1️⃣ Bring up the network and create the channel
+    # 1️⃣ Bring up the test network and create the channel
     cd fabric-samples/test-network
+    docker ps                      # Ensure Docker is running
+    ./network.sh down              # (Optional) Tear down any old network
     ./network.sh up createChannel -c pharmachannel -ca
     
-    # 2️⃣ Add additional organizations
-    ./addOrg3.sh --orgName Manufacturer --orgDomain manufacturer.example.com
-    ./addOrg3.sh --orgName Distributor --orgDomain distributor.example.com
-    ./addOrg3.sh --orgName Pharmacy --orgDomain pharmacy.example.com
+    # 2️⃣ Deploy the chaincode
+    # This works for Org1 and Org2 in the official test network
+    # Adjust the path and names accordingly
+    ./network.sh deployCC \
+    -ccn pharma \
+    -ccp ../../contract \
+    -ccl javascript \
+    -c pharmachannel \
+    -ccv 1
     
-    # 3️⃣ Deploy the chaincode
-    ./network.sh deployCC -ccn pharma -ccp ../../contract -ccl javascript -c pharmachannel -ccv 1
-    
-    # 4️⃣ Register users for each organization
+    # 3️⃣ Register users for the available organizations
+    # (Org1 and Org2 only, using official test-network connections.)
     cd ../../backend/node
-    node manufacturer.js
-    node distributor.js
-    node pharmacy.js
+    node registerOrg1User.js
+    node registerOrg2User.js
     ```
 
 5. **Start the hyperledger network after stopped**:
     ```bash
     cd fabric-samples/test-network
-    ./network.sh up
+    ./network.sh down
     ```
 
 ---
