@@ -7,11 +7,12 @@ contract/node_modules/
 *.log
 
 # Build output
-.idea
+backend/node/wallet
 
 # OS files
 .DS_Store
 Thumbs.db
+.idea
 
 # Environment files
 .env
