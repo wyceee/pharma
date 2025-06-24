@@ -6,6 +6,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const defaultOrg = {
+    orgName: 'org1',
+    mspId: 'Org1MSP',
+    domain: 'org1.example.com',
+};
+
 export function getCCP() {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
@@ -18,10 +24,29 @@ export function getCCP() {
     return ccp;
 }
 
+// New: Get CCP for any org
+export function getCCPByOrg(org = defaultOrg) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const networkPath = `../../fabric-samples/test-network/organizations/peerOrganizations/${org.domain}/`;
+    const ccpPath = path.resolve(__dirname, `${networkPath}/connection-${org.orgName}.json`);
+    const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+    return ccp;
+}
+
 export function getCA() {
     const caURL = getCCP().certificateAuthorities['ca.org1.example.com'].url;
     const ca = new FabricCAServices(caURL);
 
+    return ca;
+}
+
+// New: Get CA for any org
+export function getCAByOrg(org = defaultOrg) {
+    const ccp = getCCPByOrg(org);
+    const caKey = Object.keys(ccp.certificateAuthorities)[0];
+    const caURL = ccp.certificateAuthorities[caKey].url;
+    const ca = new FabricCAServices(caURL);
     return ca;
 }
 
@@ -32,15 +57,15 @@ export async function initLedger() {
     await gateway.disconnect();
 }
 
-export async function getWallet() {
-    const walletPath = path.join(process.cwd(), 'wallet');
+export async function getWallet(walletDir = 'wallet') {
+    const walletPath = path.join(process.cwd(), walletDir);
     const wallet = await Wallets.newFileSystemWallet(walletPath);
 
     return wallet;
 }
 
-async function getContract(identityName) {
-    const wallet = await getWallet();
+async function getContract(identityName, org = defaultOrg, walletDir = 'wallet') {
+    const wallet = await getWallet(walletDir);
     const identity = await wallet.get(identityName);
 
     if (!identity) {
@@ -48,7 +73,7 @@ async function getContract(identityName) {
     }
 
     const gateway = new Gateway();
-    await gateway.connect(getCCP(), { wallet, identity: identityName, discovery: { enabled: true, asLocalhost: true } });
+    await gateway.connect(getCCPByOrg(org), { wallet, identity: identityName, discovery: { enabled: true, asLocalhost: true } });
     const network = await gateway.getNetwork('pharmachannel');
     const contract = network.getContract('pharma');
     return { contract, gateway };

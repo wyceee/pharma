@@ -2,17 +2,26 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authController from './controller/authController.js';
+import {initLedger} from "./service/contractService.js";
 
 dotenv.config();
+const initApp = async () => {
+    console.log("Initializing ledger...");
+    await initLedger();
+    const app = express();
+    const PORT = 8085;
 
-const app = express();
-const PORT = 8085;
+    app.use(cors());
+    app.use(express.json());
 
-app.use(cors());
-app.use(express.json());
+    app.use('/', authController);
 
-app.use('/', authController);
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+initApp().catch(error => {
+    console.error("Error initializing the application:", error);
+    process.exit(1);
 });
