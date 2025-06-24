@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/builders" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/config" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/fabric-ca/ordererOrg/msp" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/fabric-ca/org1/msp" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/fabric-ca/org2/msp" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/ordererOrganizations/example.com" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com" />
+      <excludeFolder url="file://$MODULE_DIR$/fabric-samples/test-network/organizations/peerOrganizations/org2.example.com" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
