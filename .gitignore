@@ -20,4 +20,4 @@ fabric-samples/
 install-fabric.sh
 package-lock.json
 graphql-settings.xml
-vcs.xml
+.idea
