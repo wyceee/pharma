@@ -19,3 +19,4 @@ contract/.env
 fabric-samples/
 install-fabric.sh
 package-lock.json
+graphql-settings.xml
