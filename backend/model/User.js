@@ -1,35 +1,28 @@
 const users = [
-    //all passwords are hashed versions of 'password123'
-    {
-        email: 'test@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
-        role: 'Admin'
-    },
     {
         email: 'manufacturer@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
+        // Password: manufacturer123
+        password: '$2b$10$Ck19ywB7yg6552UffP0cyeR6JnEFtG0DY41wFDNCEFWV/FD41Ey9q',
         role: 'Manufacturer'
     },
     {
         email: 'qualitycontrol@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
+        // Password: qualitycontrol123
+        password: '$2b$10$yHWMpLbU0PCNun8919dQ.eUrGoVoaBH9ZCmTA4U3iGSjelJRARk16',
         role: 'QualityControl'
     },
     {
         email: 'distributor@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
+        // Password: distributor123
+        password: '$2b$10$EAisKjJ30zRT/YtSYV19x.i7S8AkpVY4SqbtMa/UZESio8Z6xQisq',
         role: 'Distributor'
     },
     {
         email: 'pharmacy@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
+        // Password: pharmacy123
+        password: '$2b$10$TC.yd8Y0VMM/T6CbjzwjLuClyyEIaDNk59KtIqHvU8m9DkrO3Xeu6',
         role: 'Pharmacy'
     },
-    {
-        email: 'customer@example.com',
-        password: '$2b$10$rkOpBZXif.lnOaWkgeJG/ui17qjKbNLpCwPYw72n41mcbf674KPTu',
-        role: 'Customer'
-    }
 ];
 
 export default {
