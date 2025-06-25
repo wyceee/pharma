@@ -40,6 +40,14 @@ class PharmaContract extends Contract {
         return JSON.stringify(product);
     }
 
+    async getProduct(ctx, batchNumber) {
+        const productBytes = await ctx.stub.getState(batchNumber);
+        if (!productBytes || productBytes.length === 0) {
+            throw new Error(`Product with batch number ${batchNumber} not found`);
+        }
+        return productBytes.toString();
+    }
+
     async inspectRecords(ctx, batchNumber, pharmacy, inspectionDate, remarks) {
         const productBytes = await ctx.stub.getState(batchNumber);
         if (!productBytes || productBytes.length === 0) {

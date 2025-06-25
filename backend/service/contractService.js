@@ -1,10 +1,10 @@
 'use strict';
 
 import FabricCAServices from 'fabric-ca-client';
-import { Gateway, Wallets } from 'fabric-network';
+import {Gateway, Wallets} from 'fabric-network';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 
 const defaultOrg = {
     orgName: 'org1',
@@ -59,12 +59,19 @@ export async function initLedger() {
 
 export async function getWallet(walletDir = 'wallet') {
     const walletPath = path.join(process.cwd(), walletDir);
-    const wallet = await Wallets.newFileSystemWallet(walletPath);
-
-    return wallet;
+    return await Wallets.newFileSystemWallet(walletPath);
 }
 
-async function getContract(identityName, org = defaultOrg, walletDir = 'wallet') {
+async function getContract(identityName, org = defaultOrg) {
+    let walletDir;
+    if (identityName === 'appManufacturer') {
+        walletDir = 'node/wallet/org1';
+    } else if (identityName === 'appDistributor') {
+        walletDir = 'node/wallet/org2';
+    } else {
+        throw new Error(`No wallet path configured for identity "${identityName}"`);
+    }
+
     const wallet = await getWallet(walletDir);
     const identity = await wallet.get(identityName);
 
@@ -73,7 +80,12 @@ async function getContract(identityName, org = defaultOrg, walletDir = 'wallet')
     }
 
     const gateway = new Gateway();
-    await gateway.connect(getCCPByOrg(org), { wallet, identity: identityName, discovery: { enabled: true, asLocalhost: true } });
+    await gateway.connect(getCCPByOrg(org), {
+        wallet,
+        identity: identityName,
+        discovery: { enabled: true, asLocalhost: true }
+    });
+
     const network = await gateway.getNetwork('pharmachannel');
     const contract = network.getContract('pharma');
     return { contract, gateway };
@@ -83,6 +95,16 @@ export async function createProduct(identityName, batchNumber, ingredients, manu
     const { contract, gateway } = await getContract(identityName);
     try {
         const result = await contract.submitTransaction('createProduct', batchNumber, ingredients, manufacturer, manufactureDate, expiryDate);
+        return result.toString();
+    } finally {
+        await gateway.disconnect();
+    }
+}
+
+export async function getProduct(identityName, batchNumber) {
+    const { contract, gateway } = await getContract(identityName);
+    try {
+        const result = await contract.evaluateTransaction('getProduct', batchNumber);
         return result.toString();
     } finally {
         await gateway.disconnect();
