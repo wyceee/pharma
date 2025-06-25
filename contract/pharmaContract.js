@@ -3,24 +3,38 @@
 const { Contract } = require('fabric-contract-api');
 
 class PharmaContract extends Contract {
-    async initLedger(ctx) {
-        const products = [
-            {
-                batchNumber: "BATCH_INIT_1",
-                ingredients: "Paracetamol",
-                manufacturer: "InitPharma",
-                manufactureDate: "2024-01-01",
-                expiryDate: "2026-01-01",
-                status: "CREATED",
-                history: []
-            }
+    // Check if the invoker is an admin of Org1 or Org2
+    _isAdmin(ctx) {
+        const mspId = ctx.clientIdentity.getMSPID();
+        const enrollmentId = ctx.clientIdentity.getAttributeValue('hf.EnrollmentID');
+
+        const allowed = [
+            { msp: 'Org1MSP', id: 'appManufacturer' },
+            { msp: 'Org2MSP', id: 'appDistributor' }
         ];
 
-        for (const product of products) {
-            await ctx.stub.putState(product.batchNumber, Buffer.from(JSON.stringify(product)));
+        return allowed.some(entry => entry.msp === mspId && entry.id === enrollmentId);
+    }
+
+// Initialize the ledger with a demo product
+    async initLedger(ctx) {
+        if (!this._isAdmin(ctx)) {
+            throw new Error('Only appManufacturer or appDistributor may initialize the ledger');
         }
 
-        return JSON.stringify({ message: "Ledger initialized" });
+        const product = {
+            batchNumber: "TX1001",
+            ingredients: "Paracetamol, Water",
+            manufacturer: ctx.clientIdentity.getMSPID() === 'Org1MSP' ? "DemoPharma" : "DemoDistributor",
+            manufactureDate: "2025-01-01",
+            expiryDate: "2027-01-01",
+            status: "CREATED",
+            history: []
+        };
+
+        await ctx.stub.putState(product.batchNumber, Buffer.from(JSON.stringify(product)));
+
+        return JSON.stringify({ message: `Ledger initialized by ${ctx.clientIdentity.getMSPID()}` });
     }
 
     async createProduct(ctx, batchNumber, ingredients, manufacturer, manufactureDate, expiryDate) {

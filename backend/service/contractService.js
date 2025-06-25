@@ -12,6 +12,34 @@ const defaultOrg = {
     domain: 'org1.example.com',
 };
 
+export async function initLedger(identityName = 'appManufacturer') {
+    let org;
+
+    if (identityName === 'appManufacturer') {
+        org = {
+            orgName: 'org1',
+            mspId: 'Org1MSP',
+            domain: 'org1.example.com'
+        };
+    } else if (identityName === 'appDistributor') {
+        org = {
+            orgName: 'org2',
+            mspId: 'Org2MSP',
+            domain: 'org2.example.com'
+        };
+    } else {
+        throw new Error(`Unknown identity: ${identityName}`);
+    }
+
+    const { contract, gateway } = await getContract(identityName, org);
+    try {
+        const result = await contract.submitTransaction('initLedger');
+        return result.toString();
+    } finally {
+        await gateway.disconnect();
+    }
+}
+
 export function getCCP() {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
@@ -23,8 +51,8 @@ export function getCCP() {
 
     return ccp;
 }
-
 // New: Get CCP for any org
+
 export function getCCPByOrg(org = defaultOrg) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
@@ -40,24 +68,14 @@ export function getCA() {
 
     return ca;
 }
-
 // New: Get CA for any org
+
 export function getCAByOrg(org = defaultOrg) {
     const ccp = getCCPByOrg(org);
     const caKey = Object.keys(ccp.certificateAuthorities)[0];
     const caURL = ccp.certificateAuthorities[caKey].url;
     const ca = new FabricCAServices(caURL);
     return ca;
-}
-
-export async function initLedger() {
-    const { contract, gateway } = await getContract('appManufacturer');
-    try {
-        const result = await contract.submitTransaction('initLedger');
-        return result.toString();
-    } finally {
-        await gateway.disconnect();
-    }
 }
 
 export async function getWallet(walletDir = 'wallet') {
