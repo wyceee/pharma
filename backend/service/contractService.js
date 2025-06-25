@@ -51,10 +51,13 @@ export function getCAByOrg(org = defaultOrg) {
 }
 
 export async function initLedger() {
-    const { contract, gateway } = await getContract('admin');
-    await contract.submitTransaction('initLedger');
-    console.log('Ledger has been initialized');
-    await gateway.disconnect();
+    const { contract, gateway } = await getContract('appManufacturer');
+    try {
+        const result = await contract.submitTransaction('initLedger');
+        return result.toString();
+    } finally {
+        await gateway.disconnect();
+    }
 }
 
 export async function getWallet(walletDir = 'wallet') {

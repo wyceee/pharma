@@ -3,6 +3,26 @@
 const { Contract } = require('fabric-contract-api');
 
 class PharmaContract extends Contract {
+    async initLedger(ctx) {
+        const products = [
+            {
+                batchNumber: "BATCH_INIT_1",
+                ingredients: "Paracetamol",
+                manufacturer: "InitPharma",
+                manufactureDate: "2024-01-01",
+                expiryDate: "2026-01-01",
+                status: "CREATED",
+                history: []
+            }
+        ];
+
+        for (const product of products) {
+            await ctx.stub.putState(product.batchNumber, Buffer.from(JSON.stringify(product)));
+        }
+
+        return JSON.stringify({ message: "Ledger initialized" });
+    }
+
     async createProduct(ctx, batchNumber, ingredients, manufacturer, manufactureDate, expiryDate) {
         const mspId = ctx.clientIdentity.getMSPID();
         if (mspId !== 'Org1MSP') {
