@@ -2,7 +2,7 @@
   <!-- Navbar content goes here -->
   <nav class="navbar">
     <!-- Example: Logo and navigation links -->
-    <div class="navbar-logo">PharmaChain</div>
+    <img src="@/assets/Pharma.png" alt="PharmaChain Logo" class="navbar-logo" />
     <ul class="navbar-links">
       <li><a href="#">Dashboard</a></li>
       <li><a href="#">Products</a></li>
@@ -27,8 +27,9 @@
   box-sizing: border-box;
 }
 .navbar-logo {
-  font-size: 1.5rem;
-  font-weight: bold;
+  height: 55px;
+  width: auto;
+  display: block;
 }
 .navbar-links {
   list-style: none;
