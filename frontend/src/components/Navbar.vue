@@ -1,18 +1,21 @@
 <template>
-  <!-- Navbar content goes here -->
   <nav class="navbar">
-    <!-- Example: Logo and navigation links -->
     <img src="@/assets/Pharma.png" alt="PharmaChain Logo" class="navbar-logo" />
     <ul class="navbar-links">
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Products</a></li>
-      <li><a href="#">Shipments</a></li>
+      <li>
+        <router-link to="/" class="nav-link" exact-active-class="active">Dashboard</router-link>
+      </li>
+      <li>
+        <router-link to="/product" class="nav-link" exact-active-class="active">Products</router-link>
+      </li>
+      <li>
+        <router-link to="/shipment" class="nav-link" exact-active-class="active">Shipments</router-link>
+      </li>
     </ul>
   </nav>
 </template>
 
 <script setup lang="ts">
-// No login logic needed
 </script>
 
 <style scoped>
@@ -29,8 +32,8 @@
 .navbar-logo {
   height: 55px;
   width: auto;
-  display: block;
 }
+
 .navbar-links {
   list-style: none;
   display: flex;
@@ -38,13 +41,23 @@
   margin: 0;
   padding: 0;
 }
-.navbar-links li a {
-  color: #000000;
+
+.navbar-links .nav-link {
+  color: #000;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
+  position: relative;
+  padding-bottom: 2px;
 }
-.navbar-links li a:hover {
-  color: #a5b4fc;
+
+.navbar-links .nav-link:hover {
+  color: #8CC342;
+}
+
+.navbar-links .nav-link.active {
+  color: #8CC342;
+  font-weight: 600;
+  border-bottom: 2px solid #8CC342;
 }
 </style>

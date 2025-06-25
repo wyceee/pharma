@@ -1,14 +1,13 @@
+<template>
+  <Navbar />
+  <div class="main-container">
+    <router-view/>
+  </div>
+</template>
+
 <script setup>
-import Dashboard from './components/Dashboard.vue'
 import Navbar from "@/components/Navbar.vue";
 </script>
-
-<template>
-<Navbar />
-<div class="main-container">
-  <Dashboard />
-</div>
-</template>
 
 <style scoped>
 .main-container {
