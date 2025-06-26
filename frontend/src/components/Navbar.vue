@@ -3,13 +3,19 @@
     <img src="@/assets/Pharma.png" alt="PharmaChain Logo" class="navbar-logo" />
     <ul class="navbar-links">
       <li>
-        <router-link to="/" class="nav-link" exact-active-class="active">Dashboard</router-link>
+        <router-link to="/" class="nav-link" exact-active-class="active">Home</router-link>
+      </li>
+      <li>
+        <router-link to="/dashboard" class="nav-link" exact-active-class="active">Dashboard</router-link>
       </li>
       <li>
         <router-link to="/product" class="nav-link" exact-active-class="active">Products</router-link>
       </li>
       <li>
         <router-link to="/shipment" class="nav-link" exact-active-class="active">Shipments</router-link>
+      </li>
+      <li>
+        <router-link to="/login" class="nav-link" exact-active-class="active">Login</router-link>
       </li>
     </ul>
   </nav>
