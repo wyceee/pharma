@@ -9,12 +9,18 @@
         <p>Sign in to access the supply chain management system</p>
       </div>
 
-      <form class="login-form">
+      <form class="login-form" @submit="handleLogin">
         <div class="form-group">
           <label for="username">Username</label>
           <div class="input-container">
             <User class="input-icon" />
-            <input id="username" type="text" placeholder="Enter your username" />
+            <input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              v-model="username"
+              required
+            />
           </div>
         </div>
 
@@ -22,14 +28,25 @@
           <label for="password">Password</label>
           <div class="input-container">
             <Lock class="input-icon" />
-            <input id="password" type="password" placeholder="Enter your password" />
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              v-model="password"
+              required
+            />
           </div>
         </div>
 
-        <button class="sign-in-button" type="submit">
+        <button class="sign-in-button" type="submit" :disabled="loading">
           <LogIn class="button-icon" />
-          Sign In
+          <span v-if="loading">Signing In...</span>
+          <span v-else>Sign In</span>
         </button>
+
+        <div v-if="error" class="error-message">
+          {{ error }}
+        </div>
       </form>
 
       <div class="terms-footer">
@@ -55,12 +72,30 @@ import {
   Shield,
   User,
   Lock,
-  UserCheck,
-  ChevronDown,
-  LogIn,
-  Building,
-  Key
+  LogIn
 } from 'lucide-vue-next'
+import { ref } from 'vue';
+import { login } from '@/service/authenticationService';
+
+const username = ref('');
+const password = ref('');
+const error = ref('');
+const loading = ref(false);
+
+const handleLogin = async (e: Event) => {
+  e.preventDefault();
+  error.value = '';
+  loading.value = true;
+  try {
+    const data = await login(username.value, password.value);
+    localStorage.setItem('token', data.token); // Store token for future requests
+    // Optionally redirect or emit event here
+  } catch (err: any) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style scoped>
@@ -160,7 +195,11 @@ import {
   border: none;
   cursor: pointer;
 }
-.sign-in-button:hover {
+.sign-in-button:disabled {
+  background-color: #4b5563;
+  cursor: not-allowed;
+}
+.sign-in-button:hover:not(:disabled) {
   background-color: #00432a;
 }
 .button-icon {
@@ -200,5 +239,10 @@ import {
 .security-icon {
   margin-right: 0.5rem;
   color: #16a34a;
+}
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
 }
 </style>
