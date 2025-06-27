@@ -121,7 +121,7 @@
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-left">
-        <img src="@/assets/pharma.png" alt="PharmaChain Logo" class="footer-icon" />
+        <img src="@/assets/Pharma.png" alt="PharmaChain Logo" class="footer-icon" />
       </div>
       <div class="footer-right">
         © 2025 PharmaChain. Securing pharmaceutical supply chains with blockchain technology.
