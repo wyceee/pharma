@@ -1,0 +1,1 @@
+export function shipProduct(productData: any): Promise<any>;

@@ -12,7 +12,7 @@
             <label for="productSelect" class="form-label">Select Product</label>
             <select id="productSelect" v-model="selectedProductId" class="form-select" @change="fillProductData">
               <option value="" disabled>Select a product</option>
-              <option v-for="product in products" :key="product.id" :value="product.id">
+              <option v-for="product in products" :key="product.batchNumber" :value="product.batchNumber">
                 {{ product.batchNumber }} - {{ product.manufacturer }}
               </option>
             </select>
@@ -96,16 +96,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getAllProducts } from '@/service/productService'
+import { shipProduct as apiShipProduct } from '@/service/distributeService'
+import { Product } from '@/types/Product'
 
-const products = ref([
-  { id: 1, batchNumber: 'BN-001', manufacturer: 'Pharma A', ingredients: 'Water, Glycerin' },
-  { id: 2, batchNumber: 'BN-002', manufacturer: 'Pharma B', ingredients: 'Alcohol, Saline' },
-  { id: 3, batchNumber: 'BN-003', manufacturer: 'Pharma C', ingredients: 'Herbs, Minerals' }
-])
-
+const products = ref<Product[]>([])
 const selectedProductId = ref('')
-
 const form = ref({
   batchNumber: '',
   distributorName: '',
@@ -115,8 +112,19 @@ const form = ref({
   ingredients: ''
 })
 
+async function fetchProducts() {
+  try {
+    // Replace 'appManufacturer' with the actual identityName as needed
+    products.value = await getAllProducts('appDistributor')
+  } catch (e) {
+    products.value = []
+  }
+}
+
+onMounted(fetchProducts)
+
 function fillProductData() {
-  const selected = products.value.find(p => p.id === Number(selectedProductId.value))
+  const selected = products.value.find(p => p.batchNumber === selectedProductId.value)
   if (selected) {
     form.value.batchNumber = selected.batchNumber
     form.value.manufacturer = selected.manufacturer
@@ -124,19 +132,30 @@ function fillProductData() {
   }
 }
 
-function shipProduct() {
-  console.log('Shipping product:', form.value);
-  alert(`Shipment submitted for batch #${form.value.batchNumber}`);
-
-  form.value = {
-    batchNumber: '',
-    distributorName: '',
-    temperatureChecks: '',
-    shippingDate: '',
-    manufacturer: '',
-    ingredients: ''
+async function shipProduct() {
+  try {
+    const identityName = localStorage.getItem('identityName')
+    // Map frontend fields to backend expected fields
+    await apiShipProduct({
+      identityName,
+      batchNumber: form.value.batchNumber,
+      distributor: form.value.distributorName, // backend expects 'distributor'
+      temperatureChecks: form.value.temperatureChecks,
+      shipDate: form.value.shippingDate // backend expects 'shipDate'
+    })
+    alert(`Shipment submitted for batch #${form.value.batchNumber}`)
+    form.value = {
+      batchNumber: '',
+      distributorName: '',
+      temperatureChecks: '',
+      shippingDate: '',
+      manufacturer: '',
+      ingredients: ''
+    }
+    selectedProductId.value = ''
+  } catch (error: any) {
+    alert(error.message || 'Failed to submit shipment')
   }
-  selectedProductId.value = ''
 }
 </script>
 
