@@ -132,6 +132,16 @@ export async function getProduct(identityName, batchNumber) {
     }
 }
 
+export async function getAllProducts(identityName) {
+    const { contract, gateway } = await getContract(identityName);
+    try {
+        const result = await contract.evaluateTransaction('getAllProducts');
+        return JSON.parse(result.toString());
+    } finally {
+        await gateway.disconnect();
+    }
+}
+
 export async function shipProduct(identityName, batchNumber, distributor, temperatureChecks, shipDate) {
     const { contract, gateway } = await getContract(identityName);
     try {

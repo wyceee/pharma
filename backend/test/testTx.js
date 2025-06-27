@@ -3,7 +3,7 @@ import { createProduct } from '../service/contractService.js';
 async function run() {
     const result = await createProduct(
         'appManufacturer',         // identityName
-        'TX1001',                  // batchNumber
+        'TX1003',                  // batchNumber
         'test',      // ingredients
         'Pfizer',                  // manufacturer
         '2025-01-01',              // manufactureDate

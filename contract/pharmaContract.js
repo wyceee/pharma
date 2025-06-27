@@ -49,7 +49,13 @@ class PharmaContract extends Contract {
             manufactureDate,
             expiryDate,
             status: 'CREATED',
-            history: []
+            history: [
+                {
+                    action: 'CREATED',
+                    manufacturer,
+                    manufactureDate
+                }
+            ]
         };
         await ctx.stub.putState(batchNumber, Buffer.from(JSON.stringify(product)));
         return JSON.stringify(product);
@@ -80,6 +86,21 @@ class PharmaContract extends Contract {
             throw new Error(`Product with batch number ${batchNumber} not found`);
         }
         return productBytes.toString();
+    }
+
+    async getAllProducts(ctx) {
+        const allResults = [];
+        const iterator = await ctx.stub.getStateByRange('', '');
+        let result = await iterator.next();
+        while (!result.done) {
+            if (result.value && result.value.value.toString()) {
+                const record = JSON.parse(result.value.value.toString('utf8'));
+                allResults.push(record);
+            }
+            result = await iterator.next();
+        }
+        await iterator.close();
+        return JSON.stringify(allResults);
     }
 
     async inspectRecords(ctx, batchNumber, pharmacy, inspectionDate, remarks) {

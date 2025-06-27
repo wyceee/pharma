@@ -1,54 +1,63 @@
 <template>
   <div v-if="currentPage === 'dashboard'">
-    <div class="dashboard-header">
-      <h1>Dashboard</h1>
-      <p>Welcome to the Pharmaceutical Supply Chain Management System</p>
+    <div v-if="loading" class="dashboard-header">
+      <h1>Loading dashboard...</h1>
     </div>
-
-    <div class="stats-cards">
-      <div class="stat-card">
-        <div class="stat-icon blue">
-          <Package class="stat-icon-svg" />
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.totalProducts }}</h3>
-          <p>Total Products</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green">
-          <Truck class="stat-icon-svg" />
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.shippedProducts }}</h3>
-          <p>Shipped Products</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon yellow">
-          <AlertTriangle class="stat-icon-svg" />
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.pendingShipments }}</h3>
-          <p>Pending Shipments</p>
-        </div>
-      </div>
+    <div v-else-if="error" class="dashboard-header">
+      <h1>Error</h1>
+      <p>{{ error }}</p>
     </div>
-
-    <div class="recent-activity">
-      <div class="recent-activity-header">
-        <h2>Recent Activity</h2>
+    <div v-else>
+      <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p>Welcome to the Pharmaceutical Supply Chain Management System</p>
       </div>
-      <div class="recent-activity-body">
-        <div v-for="activity in recentActivity" :key="activity.id" class="recent-activity-item">
-          <div class="recent-activity-icon">
-            <Package class="recent-activity-icon-svg" />
+
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <Package class="stat-icon-svg"/>
           </div>
-          <div class="recent-activity-content">
-            <p class="recent-activity-action">{{ activity.action }}</p>
-            <p class="recent-activity-details">{{ activity.details }}</p>
+          <div class="stat-content">
+            <h3>{{ stats.totalProducts }}</h3>
+            <p>Total Products</p>
           </div>
-          <div class="recent-activity-time">{{ activity.time }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <Truck class="stat-icon-svg"/>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.shippedProducts }}</h3>
+            <p>Shipped Products</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <AlertTriangle class="stat-icon-svg"/>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stats.pendingShipments }}</h3>
+            <p>Pending Shipments</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="recent-activity">
+        <div class="recent-activity-header">
+          <h2>Recent Activity</h2>
+        </div>
+        <div class="recent-activity-body">
+          <div v-for="activity in recentActivity" :key="activity.id" class="recent-activity-item">
+            <div class="recent-activity-icon">
+              <Package class="recent-activity-icon-svg"/>
+            </div>
+            <div class="recent-activity-content">
+              <p class="recent-activity-action">{{ activity.action }}</p>
+              <p class="recent-activity-details">{{ activity.details }}</p>
+            </div>
+            <div class="recent-activity-time">{{ activity.time }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -56,42 +65,38 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Package,
-  Truck,
-  AlertTriangle
-} from 'lucide-vue-next'
-
-import { ref } from 'vue'
+import {Package, Truck, AlertTriangle} from 'lucide-vue-next'
+import {ref, onMounted} from 'vue'
+import {getDashboardStats} from '@/service/productService'
 
 const currentPage = ref('dashboard')
-
 const stats = ref({
-  totalProducts: 156,
-  shippedProducts: 89,
-  pendingShipments: 67
+  totalProducts: 0,
+  shippedProducts: 0,
+  pendingShipments: 0
 })
+type Activity = {
+  id: string
+  action: string
+  details: string
+  time: string
+}
+const recentActivity = ref<Activity[]>([])
+const loading = ref(true)
+const error = ref('')
 
-const recentActivity = ref([
-  {
-    id: 1,
-    action: 'Product Created',
-    details: 'Batch #PH2024001 - Paracetamol 500mg',
-    time: '2 hours ago'
-  },
-  {
-    id: 2,
-    action: 'Product Shipped',
-    details: 'Batch #PH2024002 shipped to MedDistrib Corp',
-    time: '4 hours ago'
-  },
-  {
-    id: 3,
-    action: 'Temperature Alert',
-    details: 'Batch #PH2024003 - Temperature exceeded threshold',
-    time: '6 hours ago'
+onMounted(async () => {
+  loading.value = true
+  try {
+    const data = await getDashboardStats()
+    stats.value = data.stats
+    recentActivity.value = data.recentActivity
+  } catch (err: any) {
+    error.value = err.message || 'Failed to load dashboard data'
+  } finally {
+    loading.value = false
   }
-])
+})
 </script>
 
 <style scoped>
@@ -122,7 +127,7 @@ const recentActivity = ref([
   padding: 1rem 1.25rem;
   border-radius: 0.5rem;
   border: 1px solid #00432a;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   flex: 1;
@@ -169,8 +174,8 @@ const recentActivity = ref([
 .recent-activity {
   border-radius: 0.5rem;
   border: 1px solid #00432a;
-  background: rgba(255,255,255,0.9);
-  box-shadow: 0px 1px 3px rgba(0,0,0,.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, .08);
 }
 
 .recent-activity-header {

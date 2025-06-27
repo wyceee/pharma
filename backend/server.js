@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authController from './controller/authController.js';
+import productController from './controller/productController.js';
 import {initLedger} from "./service/contractService.js";
 
 dotenv.config();
@@ -15,6 +16,7 @@ const initApp = async () => {
     app.use(express.json());
 
     app.use('/', authController);
+    app.use('/api', productController);
 
     app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);
