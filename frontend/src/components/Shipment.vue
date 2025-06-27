@@ -26,6 +26,7 @@
                 class="form-input"
                 placeholder="Batch Number"
                 required
+                readonly
             />
           </div>
 
