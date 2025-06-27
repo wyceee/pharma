@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:20.10.16-dind
+        options: --privileged
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        run: docker build -t pharma-backend ./backend
+
+      - name: Build frontend image
+        run: docker build -t pharma-frontend ./frontend
+
+      - name: Build and start Fabric network
+        run: |
+          chmod +x ./start-fabric.sh
+          ./start-fabric.sh
+
+      - name: Deploy smart contract
+        run: |
+          chmod +x ./deploy-contract.sh
+          ./deploy-contract.sh
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag and push backend image
+        run: |
+          docker tag pharma-backend ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+
+      - name: Tag and push frontend image
+        run: |
+          docker tag pharma-frontend ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+
+      - name: Deploy on remote server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
+            git pull
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+            docker-compose down || true
+            docker-compose up -d --build
+            chmod +x ./start-fabric.sh
+            ./start-fabric.sh
+            chmod +x ./deploy-contract.sh
+            ./deploy-contract.sh
