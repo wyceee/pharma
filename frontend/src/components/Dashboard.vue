@@ -43,31 +43,70 @@
         </div>
       </div>
 
-      <div class="recent-activity">
-        <div class="recent-activity-header">
-          <h2>Recent Activity</h2>
-        </div>
         <div class="recent-activity-body">
-          <div v-for="activity in recentActivity" :key="activity.id" class="recent-activity-item">
-            <div class="recent-activity-icon">
-              <Package class="recent-activity-icon-svg"/>
+          <div
+              v-for="activity in recentActivity"
+              :key="activity.id"
+              class="recent-activity-item"
+              @click="toggleExpand(activity.id)"
+              :aria-expanded="expandedId === activity.id"
+          >
+            <div class="expand-btn">
+              <svg
+                  class="expand-icon"
+                  :class="{ rotated: expandedId === activity.id }"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  width="10"
+                  height="10"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div
+                class="recent-activity-icon"
+                :style="{ backgroundColor: getActivityBg(activity.action) }"
+            >
+              <component
+                  :is="getActivityIcon(activity.action).icon"
+                  class="recent-activity-icon-svg"
+                  :style="{ color: getActivityIcon(activity.action).color }"
+              />
             </div>
             <div class="recent-activity-content">
-              <p class="recent-activity-action">{{ activity.action }}</p>
-              <p class="recent-activity-details">{{ activity.details }}</p>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <p class="recent-activity-action">{{ activity.action }}</p>
+                  <p class="recent-activity-details">Batch: {{ activity.product.batchNumber }}</p>
+                </div>
+              </div>
+              <div
+                  v-show="expandedId === activity.id"
+                  class="recent-activity-product-details"
+              >
+                <p><strong>Ingredients:</strong> {{ activity.product.ingredients }}</p>
+                <p><strong>Manufacturer:</strong> {{ activity.product.manufacturer }}</p>
+                <p><strong>Manufacture Date:</strong> {{ activity.product.manufactureDate }}</p>
+                <p><strong>Expiry Date:</strong> {{ activity.product.expiryDate }}</p>
+                <p v-if="activity.product.distributor"><strong>Distributor:</strong> {{ activity.product.distributor }}</p>
+                <p v-if="activity.product.pharmacy"><strong>Pharmacy:</strong> {{ activity.product.pharmacy }}</p>
+                <p v-if="activity.product.temperatureChecks"><strong>Temp Checks:</strong> {{ activity.product.temperatureChecks }}</p>
+                <p v-if="activity.product.remarks"><strong>Remarks:</strong> {{ activity.product.remarks }}</p>
+              </div>
             </div>
             <div class="recent-activity-time">{{ activity.time }}</div>
           </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {Package, Truck, AlertTriangle} from 'lucide-vue-next'
-import {ref, onMounted} from 'vue'
-import {getDashboardStats} from '@/service/productService'
+import { Package, Truck, AlertTriangle } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { getDashboardStats } from '@/service/productService'
 
 const currentPage = ref('dashboard')
 const stats = ref({
@@ -80,10 +119,31 @@ type Activity = {
   action: string
   details: string
   time: string
+  product?: any
 }
 const recentActivity = ref<Activity[]>([])
 const loading = ref(true)
 const error = ref('')
+
+const expandedId = ref<string | null>(null);
+
+function toggleExpand(id: string) {
+  expandedId.value = expandedId.value === id ? null : id;
+}
+
+function getActivityIcon(action: string) {
+  if (action === 'SHIPPED') return { icon: Truck, color: '#b23838' };
+  if (action === 'CREATED') return { icon: Package, color: '#2563eb' };
+  if (action === 'INSPECTED') return { icon: AlertTriangle, color: '#f59e42' };
+  return { icon: Package, color: '#2563eb' };
+}
+
+function getActivityBg(action: string) {
+  if (action === 'SHIPPED') return '#fde8e8';
+  if (action === 'CREATED') return '#ebf8ff';
+  if (action === 'INSPECTED') return '#fef3c7';
+  return '#ebf8ff';
+}
 
 onMounted(async () => {
   loading.value = true
@@ -100,6 +160,57 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.expand-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.expand-btn:hover {
+  background: #e0e7ef;
+  border-color: #2563eb;
+}
+
+.expand-icon {
+  width: 10px !important;
+  height: 10px !important;
+  color: #2563eb;
+  transition: transform 0.3s;
+}
+
+.expand-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.recent-activity-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recent-activity-item:hover {
+  background-color: #f3f4f6;
+}
+
+.expand-icon {
+  color: #2563eb;
+  transition: transform 0.3s;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  display: block;
+}
+
+.expand-icon.rotated {
+  transform: rotate(180deg);
+}
 
 .dashboard-header {
   margin-bottom: 4rem;
@@ -171,22 +282,15 @@ onMounted(async () => {
   font-size: 0.9rem;
 }
 
-.recent-activity {
-  border-radius: 0.5rem;
-  border: 1px solid #00432a;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, .08);
-}
-
-.recent-activity-header {
-  padding: 1rem 1.25rem 0.5rem 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
 .recent-activity-header h2 {
   font-size: 1.1rem;
   font-weight: 600;
   color: #111827;
+}
+
+.recent-activity-body {
+  padding: 1rem 1.25rem;
+  background: #fff;
 }
 
 .recent-activity-body {
@@ -197,14 +301,15 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   padding: 0.75rem;
+  font-size: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .recent-activity-icon {
   flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.8rem;
+  height: 1.8rem;
   background-color: #ebf8ff;
   border-radius: 50%;
   display: flex;
@@ -213,8 +318,8 @@ onMounted(async () => {
 }
 
 .recent-activity-icon-svg {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 1.1rem;
+  height: 1.1rem;
   color: #2563eb;
 }
 
@@ -224,14 +329,13 @@ onMounted(async () => {
 }
 
 .recent-activity-action {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: bold;
   color: #111827;
 }
 
 .recent-activity-details {
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 1rem;
 }
 
 .recent-activity-time {

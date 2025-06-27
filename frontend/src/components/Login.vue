@@ -75,21 +75,32 @@ import {
   LogIn
 } from 'lucide-vue-next'
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { login } from '@/service/authenticationService';
+import { useAuthStore } from '@/stores/auth';
 
-const username = ref('');
-const password = ref('');
-const error = ref('');
-const loading = ref(false);
+const username = ref<string>('');
+const password = ref<string>('');
+const error = ref<string>('');
+const loading = ref<boolean>(false);
+const router = useRouter();
+const auth = useAuthStore();
+
+type LoginResponse = {
+  token: string;
+  role: string;
+};
 
 const handleLogin = async (e: Event) => {
   e.preventDefault();
   error.value = '';
   loading.value = true;
   try {
-    const data = await login(username.value, password.value);
-    localStorage.setItem('token', data.token); // Store token for future requests
-    // Optionally redirect or emit event here
+    const data = await login(username.value, password.value) as LoginResponse;
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('role', data.role);
+    auth.setRole(data.role);
+    router.push('/dashboard');
   } catch (err: any) {
     error.value = err.message;
   } finally {

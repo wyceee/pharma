@@ -32,7 +32,8 @@ router.get('/dashboard-stats', async (req, res) => {
                     id: `${product.batchNumber}-${idx}`,
                     action: h.action,
                     details,
-                    time: h.shipDate || h.inspectionDate || product.manufactureDate || ''
+                    time: h.shipDate || h.inspectionDate || product.manufactureDate || '',
+                    product
                 });
             });
         });

@@ -6,16 +6,37 @@ import Home from "@/components/Home.vue";
 import Login from "@/components/Login.vue";
 
 const routes = [
-    { path: '/', name: 'Home', component: Home },
+    { path: '/', name: 'Home', component: Home, meta: { roles: ['Manufacturer', 'Distributor'] } },
     { path: '/login', name: 'Login', component: Login },
-    { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-    { path: '/product', name: 'Product', component: Product },
-    { path: '/shipment', name: 'Shipment', component: Shipment },
+    { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { roles: ['Manufacturer', 'Distributor'] } },
+    { path: '/product', name: 'Product', component: Product, meta: { roles: ['Manufacturer'] } },
+    { path: '/shipment', name: 'Shipment', component: Shipment, meta: { roles: ['Distributor'] } },
+    { path: '/:pathMatch(.*)*', redirect: '/' }
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes
+});
+
+// Navigation guard
+router.beforeEach((to, from, next) => {
+    const role = localStorage.getItem('role');
+
+    if (to.name === 'Login' && role) {
+        return next({ name: 'Dashboard' });
+    }
+
+    if (to.meta && to.meta.roles) {
+        if (!role || !to.meta.roles.includes(role)) {
+            if (role) {
+                return next({ name: 'Dashboard' });
+            } else {
+                return next({ name: 'Home' });
+            }
+        }
+    }
+    next();
 });
 
 export default router;

@@ -5,23 +5,37 @@
       <li>
         <router-link to="/" class="nav-link" exact-active-class="active">Home</router-link>
       </li>
-      <li>
+      <li v-if="auth.role === 'Manufacturer' || auth.role === 'Distributor'">
         <router-link to="/dashboard" class="nav-link" exact-active-class="active">Dashboard</router-link>
       </li>
-      <li>
+      <li v-if="auth.role === 'Manufacturer'">
         <router-link to="/product" class="nav-link" exact-active-class="active">Products</router-link>
       </li>
-      <li>
+      <li v-if="auth.role === 'Distributor'">
         <router-link to="/shipment" class="nav-link" exact-active-class="active">Shipments</router-link>
       </li>
-      <li>
+      <li v-if="!auth.role">
         <router-link to="/login" class="nav-link" exact-active-class="active">Login</router-link>
+      </li>
+      <li v-if="auth.role">
+        <a class="nav-link" href="#" @click.prevent="logout">Logout</a>
       </li>
     </ul>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
+const auth = useAuthStore();
+const router = useRouter();
+
+const logout = () => {
+  auth.setRole(null);
+  localStorage.removeItem('token');
+  router.push('/login');
+};
 </script>
 
 <style scoped>

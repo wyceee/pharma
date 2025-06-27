@@ -10,7 +10,7 @@
           A blockchain-powered solution ensuring transparency, traceability, and trust in pharmaceutical distribution from manufacturer to patient.
         </p>
         <div class="hero-buttons">
-          <button class="btn primary">Login</button>
+          <button class="btn primary" @click="goToLogin">Login</button>
           <button class="btn secondary">View Repository</button>
         </div>
       </div>
@@ -132,6 +132,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   CheckCircle,
   Package,
@@ -144,6 +145,10 @@ import {
 } from 'lucide-vue-next'
 
 const mobileMenuOpen = ref(false)
+const router = useRouter()
+const goToLogin = () => {
+  router.push('/login')
+}
 </script>
 
 <style scoped>
