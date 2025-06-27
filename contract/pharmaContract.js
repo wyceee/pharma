@@ -146,21 +146,6 @@ class PharmaContract extends Contract {
         await iterator.close();
         return JSON.stringify(allResults);
     }
-
-    async inspectRecords(ctx, batchNumber, pharmacy, inspectionDate, remarks) {
-        const productBytes = await ctx.stub.getState(batchNumber);
-        if (!productBytes || productBytes.length === 0) {
-            throw new Error(`Product with batch number ${batchNumber} does not exist`);
-        }
-        const product = JSON.parse(productBytes.toString());
-        product.status = 'INSPECTED';
-        product.pharmacy = pharmacy;
-        product.inspectionDate = inspectionDate;
-        product.remarks = remarks;
-        product.history.push({ action: 'INSPECTED', pharmacy, inspectionDate, remarks });
-        await ctx.stub.putState(batchNumber, Buffer.from(JSON.stringify(product)));
-        return JSON.stringify(product);
-    }
 }
 
 module.exports = PharmaContract;

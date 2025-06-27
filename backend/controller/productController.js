@@ -12,7 +12,12 @@ router.post('/products', async (req, res) => {
         const result = await createProduct(identityName, batchNumber, name,  ingredients, manufacturer, manufactureDate, expiryDate);
         res.status(201).json({ message: 'Product created', result });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        let msg = error.message || 'Failed to create product.';
+        const match = msg.match(/Product with batch number [^.,|]+/);
+        if (match && match[0]) {
+            msg = match[0].trim();
+        }
+        res.status(500).json({ message: msg });
     }
 });
 

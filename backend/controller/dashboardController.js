@@ -22,10 +22,6 @@ router.get('/dashboard-stats', async (req, res) => {
                     details += ` | Distributor: ${h.distributor || product.distributor}`;
                     if (h.temperatureChecks) details += ` | Temp: ${h.temperatureChecks}`;
                 }
-                if (h.action === 'INSPECTED') {
-                    details += ` | Pharmacy: ${h.pharmacy}`;
-                    if (h.remarks) details += ` | Remarks: ${h.remarks}`;
-                }
                 recentActivity.push({
                     id: `${product.batchNumber}-${idx}`,
                     action: h.action,

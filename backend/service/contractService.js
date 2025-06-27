@@ -152,16 +152,6 @@ export async function shipProduct(identityName, batchNumber, distributor, temper
     }
 }
 
-export async function inspectRecords(identityName, batchNumber, pharmacy, inspectionDate, remarks) {
-    const { contract, gateway } = await getContract(identityName);
-    try {
-        const result = await contract.submitTransaction('inspectRecords', batchNumber, pharmacy, inspectionDate, remarks);
-        return result.toString();
-    } finally {
-        await gateway.disconnect();
-    }
-}
-
 // Utility: Build CA Client from a Connection Profile
 export async function buildCAClient(ccpPath, caHostName) {
     const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));

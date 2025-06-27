@@ -6,9 +6,9 @@ import Home from "@/components/Home.vue";
 import Login from "@/components/Login.vue";
 
 const routes = [
-    { path: '/', name: 'Home', component: Home }, // No roles restriction
+    { path: '/', name: 'Home', component: Home },
     { path: '/login', name: 'Login', component: Login },
-    { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { roles: ['Manufacturer', 'Distributor', 'Pharmacy'] } },
+    { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { roles: ['Manufacturer', 'Distributor'] } },
     { path: '/product', name: 'Product', component: Product, meta: { roles: ['Manufacturer'] } },
     { path: '/shipment', name: 'Shipment', component: Shipment, meta: { roles: ['Distributor'] } },
     { path: '/:pathMatch(.*)*', redirect: '/' }

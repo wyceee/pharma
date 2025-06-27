@@ -10,13 +10,7 @@ const users = [
         // Password: distributor123
         password: '$2b$10$EAisKjJ30zRT/YtSYV19x.i7S8AkpVY4SqbtMa/UZESio8Z6xQisq',
         role: 'Distributor'
-    },
-    {
-        email: 'pharmacy@example.com',
-        // Password: pharmacy123
-        password: '$2b$10$TC.yd8Y0VMM/T6CbjzwjLuClyyEIaDNk59KtIqHvU8m9DkrO3Xeu6',
-        role: 'Pharmacy'
-    },
+    }
 ];
 
 export default {
