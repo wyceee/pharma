@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import { Package, Truck, AlertTriangle } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
-import { getDashboardStats } from '@/service/productService'
+import { getDashboardStats } from '@/service/dashboardService'
 
 const currentPage = ref('dashboard')
 const stats = ref({

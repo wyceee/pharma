@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authController from './controller/authController.js';
+import dashboardController from './controller/dashboardController.js';
 import productController from './controller/productController.js';
 import {initLedger} from "./service/contractService.js";
+import distributeController from "./controller/distributeController.js";
 
 dotenv.config();
 const initApp = async () => {
@@ -16,7 +18,9 @@ const initApp = async () => {
     app.use(express.json());
 
     app.use('/', authController);
+    app.use('/api', dashboardController);
     app.use('/api', productController);
+    app.use('/api', distributeController);
 
     app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);

@@ -1,1 +1,2 @@
-export function getDashboardStats(): Promise<any>;
+export function createProduct(productData: any): Promise<any>;
+

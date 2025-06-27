@@ -89,6 +89,7 @@ const auth = useAuthStore();
 type LoginResponse = {
   token: string;
   role: string;
+  identityName: string;
 };
 
 const handleLogin = async (e: Event) => {
@@ -99,6 +100,7 @@ const handleLogin = async (e: Event) => {
     const data = await login(username.value, password.value) as LoginResponse;
     localStorage.setItem('token', data.token);
     localStorage.setItem('role', data.role);
+    localStorage.setItem('identityName', data.identityName);
     auth.setRole(data.role);
     router.push('/dashboard');
   } catch (err: any) {

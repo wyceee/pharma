@@ -33,16 +33,24 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="submit-button">Create Product</button>
+          <button type="submit" class="submit-button" :disabled="loading">
+            <span v-if="loading" class="loader"></span>
+            <span v-else>Create Product</span>
+          </button>
         </div>
       </form>
+
+      <div v-if="error" class="error-message">{{ error }}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { createProduct as createProductAPI } from '../service/productService'
 
+const loading = ref(false)
+const error = ref('')
 const form = ref({
   batchNumber: '',
   ingredients: '',
@@ -51,16 +59,25 @@ const form = ref({
   expiryDate: ''
 })
 
-function createProduct() {
-  console.log('Product created:', form.value)
-  alert(`Product for batch #${form.value.batchNumber} created.`)
-  form.value = {
-    batchNumber: '',
-    ingredients: '',
-    manufacturer: '',
-    manufactureDate: '',
-    expiryDate: ''
+async function createProduct() {
+  loading.value = true
+  error.value = ''
+  try {
+    const identityName = localStorage.getItem('identityName')
+    await createProductAPI({ ...form.value, identityName })
+    alert(`Product for batch #${form.value.batchNumber} created.`)
+    form.value = {
+      batchNumber: '',
+      ingredients: '',
+      manufacturer: '',
+      manufactureDate: '',
+      expiryDate: ''
+    }
+  } catch (err: any) {
+    error.value = err.message || 'Failed to create product.'
+    alert(error.value)
   }
+  loading.value = false
 }
 </script>
 
@@ -133,6 +150,7 @@ function createProduct() {
 }
 
 .submit-button {
+  position: relative;
   margin-left: 0.75rem;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -146,12 +164,38 @@ function createProduct() {
   transition: background-color 0.2s ease;
 }
 
-.submit-button:hover {
-  background-color: #013526;
+.submit-button:disabled {
+  background-color: #6b7280;
+  cursor: not-allowed;
 }
 
-.submit-button:focus {
-  outline: 2px solid #00432a;
-  outline-offset: 2px;
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.error-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
 }
 </style>
