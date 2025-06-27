@@ -100,13 +100,19 @@ node registerOrg1User.js
 node registerOrg2User.js
  ```
 
-### 5. Start Backend Server
+### 5. **Start the hyperledger network after stopped**:
+```bash
+cd fabric-samples/test-network
+./network.sh down
+```
+
+### 6. Start Backend Server
 ```sh
 cd backend
 node server.js
 ```
 
-### 6. Start Frontend
+### 7. Start Frontend
 ```sh
 cd frontend
 npm run dev
