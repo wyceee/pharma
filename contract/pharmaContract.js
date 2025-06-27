@@ -22,17 +22,49 @@ class PharmaContract extends Contract {
             throw new Error('Only appManufacturer or appDistributor may initialize the ledger');
         }
 
-        const product = {
+        const product1 = {
             batchNumber: "TX1001",
             ingredients: "Paracetamol, Water",
-            manufacturer: ctx.clientIdentity.getMSPID() === 'Org1MSP' ? "DemoPharma" : "DemoDistributor",
+            manufacturer: "DemoPharma",
             manufactureDate: "2025-01-01",
             expiryDate: "2027-01-01",
             status: "CREATED",
-            history: []
+            history: [
+                {
+                    action: 'CREATED',
+                    manufacturer: "DemoPharma",
+                    manufactureDate: "2025-01-01"
+                }
+            ]
         };
 
-        await ctx.stub.putState(product.batchNumber, Buffer.from(JSON.stringify(product)));
+        const product2 = {
+            batchNumber: "TX1002",
+            ingredients: "Ibuprofen, Water",
+            manufacturer: "DemoPharma",
+            manufactureDate: "2025-02-01",
+            expiryDate: "2027-02-01",
+            status: "SHIPPED",
+            distributor: "DemoDistributor",
+            temperatureChecks: "2-8C",
+            shipDate: "2025-03-01",
+            history: [
+                {
+                    action: 'CREATED',
+                    manufacturer: "DemoPharma",
+                    manufactureDate: "2025-02-01"
+                },
+                {
+                    action: 'SHIPPED',
+                    distributor: "DemoDistributor",
+                    temperatureChecks: "2-8C",
+                    shipDate: "2025-03-01"
+                }
+            ]
+        };
+
+        await ctx.stub.putState(product1.batchNumber, Buffer.from(JSON.stringify(product1)));
+        await ctx.stub.putState(product2.batchNumber, Buffer.from(JSON.stringify(product2)));
 
         return JSON.stringify({ message: `Ledger initialized by ${ctx.clientIdentity.getMSPID()}` });
     }
