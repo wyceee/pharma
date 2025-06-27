@@ -100,7 +100,7 @@ node registerOrg1User.js
 node registerOrg2User.js
  ```
 
-### 5. **Start the hyperledger network after stopped**:
+### 5. **(Optional) Reset the Hyperledger Fabric network**:
 ```bash
 cd fabric-samples/test-network
 ./network.sh down
