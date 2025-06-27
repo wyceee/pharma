@@ -78,7 +78,7 @@
             <div class="recent-activity-content">
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                  <p class="recent-activity-action">{{ activity.action }}</p>
+                  <p class="recent-activity-action">{{ activity.product.name }}</p>
                   <p class="recent-activity-details">Batch: {{ activity.product.batchNumber }}</p>
                 </div>
               </div>
@@ -96,7 +96,7 @@
                 <p v-if="activity.product.remarks"><strong>Remarks:</strong> {{ activity.product.remarks }}</p>
               </div>
             </div>
-            <div class="recent-activity-time">{{ activity.time }}</div>
+            <div class="recent-activity-time">{{ activity.action }}</div>
           </div>
         </div>
     </div>
@@ -339,7 +339,7 @@ onMounted(async () => {
 }
 
 .recent-activity-time {
-  font-size: 0.8rem;
-  color: #6b7280;
+  font-size: 1rem;
+  font-weight: bold;
 }
 </style>

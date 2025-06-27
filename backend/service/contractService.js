@@ -112,10 +112,10 @@ async function getContract(identityName, org = defaultOrg) {
     return { contract, gateway };
 }
 
-export async function createProduct(identityName, batchNumber, ingredients, manufacturer, manufactureDate, expiryDate) {
+export async function createProduct(identityName, batchNumber, name, ingredients, manufacturer, manufactureDate, expiryDate) {
     const { contract, gateway } = await getContract(identityName);
     try {
-        const result = await contract.submitTransaction('createProduct', batchNumber, ingredients, manufacturer, manufactureDate, expiryDate);
+        const result = await contract.submitTransaction('createProduct', batchNumber, name, ingredients, manufacturer, manufactureDate, expiryDate);
         return result.toString();
     } finally {
         await gateway.disconnect();
