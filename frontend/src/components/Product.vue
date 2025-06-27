@@ -13,6 +13,11 @@
         </div>
 
         <div class="form-group">
+          <label for="name" class="form-label">Product Name</label>
+          <input id="name" v-model="form.name" class="form-input" required />
+        </div>
+
+        <div class="form-group">
           <label for="ingredients" class="form-label">Ingredients</label>
           <input id="ingredients" v-model="form.ingredients" class="form-input" required />
         </div>
@@ -53,6 +58,7 @@ const loading = ref(false)
 const error = ref('')
 const form = ref({
   batchNumber: '',
+  name: '',
   ingredients: '',
   manufacturer: '',
   manufactureDate: '',
@@ -68,14 +74,20 @@ async function createProduct() {
     alert(`Product for batch #${form.value.batchNumber} created.`)
     form.value = {
       batchNumber: '',
+      name: "",
       ingredients: '',
       manufacturer: '',
       manufactureDate: '',
       expiryDate: ''
     }
   } catch (err: any) {
-    error.value = err.message || 'Failed to create product.'
-    alert(error.value)
+    let msg = err.message || 'Failed to create product.'
+    const match = msg.match(/Product with batch number [^,|]+/)
+    if (match && match[0]) {
+      msg = match[0].trim()
+    }
+    error.value = msg
+    alert(msg)
   }
   loading.value = false
 }

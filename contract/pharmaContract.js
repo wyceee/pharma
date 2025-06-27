@@ -24,6 +24,7 @@ class PharmaContract extends Contract {
 
         const product1 = {
             batchNumber: "TX1001",
+            name: "Paracetamol 500mg",
             ingredients: "Paracetamol, Water",
             manufacturer: "DemoPharma",
             manufactureDate: "2025-01-01",
@@ -40,6 +41,7 @@ class PharmaContract extends Contract {
 
         const product2 = {
             batchNumber: "TX1002",
+            name: "Ibuprofen 200mg",
             ingredients: "Ibuprofen, Water",
             manufacturer: "DemoPharma",
             manufactureDate: "2025-02-01",
@@ -69,13 +71,19 @@ class PharmaContract extends Contract {
         return JSON.stringify({ message: `Ledger initialized by ${ctx.clientIdentity.getMSPID()}` });
     }
 
-    async createProduct(ctx, batchNumber, ingredients, manufacturer, manufactureDate, expiryDate) {
+    async createProduct(ctx, batchNumber, name, ingredients, manufacturer, manufactureDate, expiryDate) {
         const mspId = ctx.clientIdentity.getMSPID();
         if (mspId !== 'Org1MSP') {
             throw new Error('Only Org1MSP (manufacturer) can create a product');
         }
+        // Check for duplicate batch number
+        const existing = await ctx.stub.getState(batchNumber);
+        if (existing && existing.length > 0) {
+            throw new Error(`Product with batch number ${batchNumber} already exists`);
+        }
         const product = {
             batchNumber,
+            name,
             ingredients,
             manufacturer,
             manufactureDate,
@@ -103,6 +111,10 @@ class PharmaContract extends Contract {
             throw new Error(`Product with batch number ${batchNumber} does not exist`);
         }
         const product = JSON.parse(productBytes.toString());
+        // Prevent shipping if already shipped
+        if (product.status === 'SHIPPED') {
+            throw new Error(`Product with batch number ${batchNumber} is already shipped`);
+        }
         product.status = 'SHIPPED';
         product.distributor = distributor;
         product.temperatureChecks = temperatureChecks;

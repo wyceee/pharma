@@ -3,7 +3,8 @@ import { createProduct } from '../service/contractService.js';
 async function run() {
     const result = await createProduct(
         'appManufacturer',         // identityName
-        'TX1003',                  // batchNumber
+        'TX1001',                  // batchNumber
+        'Paracetamol 500mg',                  // batchNumber
         'test',      // ingredients
         'Pfizer',                  // manufacturer
         '2025-01-01',              // manufactureDate

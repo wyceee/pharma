@@ -3,8 +3,6 @@ import { getAllProducts } from '../service/contractService.js';
 
 const router = express.Router();
 
-// backend/controller/dashboardController.js
-
 router.get('/dashboard-stats', async (req, res) => {
     try {
         const products = await getAllProducts('appManufacturer');
