@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { API_URL } from './apiConfig';
 
-const API_URL = 'http://localhost:8085/api';
 
 export const shipProduct = async (shipData) => {
     try {
@@ -18,5 +18,3 @@ export const shipProduct = async (shipData) => {
 export default {
     shipProduct
 }
-
-
