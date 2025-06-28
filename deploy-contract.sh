@@ -3,6 +3,8 @@
 # Script to deploy the pharma chaincode and register users as in the README
 set -e
 
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+
 cd fabric-samples/test-network
 
 
