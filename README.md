@@ -82,7 +82,7 @@ cd fabric-samples/test-network
 docker ps                      # Ensure Docker is running
 ./network.sh down              # (Optional) Tear down any old network
 ./network.sh up createChannel -c pharmachannel -ca
-        
+
 # 2️⃣ Deploy the chaincode
 # This works for Org1 and Org2 in the official test network
 # Adjust the path and names accordingly
