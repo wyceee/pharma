@@ -6,7 +6,7 @@ set -euo pipefail
 echo "🚀 Starting Fabric network setup..."
 
 # --- Check for required tools ---
-for cmd in curl docker docker-compose; do
+for cmd in curl docker; do
   if ! command -v $cmd >/dev/null 2>&1; then
     echo "❌ Required command '$cmd' is not installed or not in PATH!" >&2
     exit 1

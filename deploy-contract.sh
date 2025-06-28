@@ -1,4 +1,7 @@
 #!/bin/bash
+# deploy-contract.sh
+# Script to deploy the chaincode and register users
+
 set -ex
 
 # --- Add all common bin paths explicitly ---
