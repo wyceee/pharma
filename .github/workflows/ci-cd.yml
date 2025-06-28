@@ -65,7 +65,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             apt update
-            apt install -y nodejs npm
+            curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+            apt-get install -y nodejs
             cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
             git pull
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
