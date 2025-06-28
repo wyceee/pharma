@@ -57,26 +57,28 @@ jobs:
           docker tag pharma-frontend ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
 
-      - name: Deploy on remote server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            apt update
-            curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-            apt-get install -y nodejs
-            cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
-            git pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
-            docker-compose down || true
-            docker-compose up -d --build
-            chmod +x ./start-fabric.sh
-            ./start-fabric.sh
-            cd backend
-            npm install
-            cd ..
-            chmod +x ./deploy-contract.sh
-            ./deploy-contract.sh
+  - name: Deploy on remote server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: root
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          apt-get remove -y nodejs
+          apt update
+          curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+          apt-get install -y nodejs
+          node -v
+          cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
+          git pull
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+          docker-compose down || true
+          docker-compose up -d --build
+          chmod +x ./start-fabric.sh
+          ./start-fabric.sh
+          cd backend
+          npm install
+          cd ..
+          chmod +x ./deploy-contract.sh
+          ./deploy-contract.sh
