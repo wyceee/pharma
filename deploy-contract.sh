@@ -1,19 +1,25 @@
 #!/bin/bash
 set -ex
 
+# --- Add all common bin paths explicitly ---
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 
-# Check for node
+# --- Check if node is installed ---
 if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js is not installed or not in PATH!" >&2
+  echo "❌ Node.js is not installed or not in PATH!" >&2
   exit 127
 fi
 
+# --- Find absolute path to node binary ---
+NODE_BIN=$(command -v node)
+echo "✅ Using node binary at: $NODE_BIN"
+$NODE_BIN -v
+
+# --- Deploy chaincode ---
 cd fabric-samples/test-network
-pwd
+echo "📄 Current directory: $(pwd)"
 ls -l
 
-# Deploy the chaincode
 ./network.sh deployCC \
   -ccn pharma \
   -ccp ../../contract \
@@ -21,12 +27,12 @@ ls -l
   -c pharmachannel \
   -ccv 1
 
+# --- Register application users ---
 cd ../../backend/node
-pwd
+echo "📄 Current directory: $(pwd)"
 ls -l
-which node
-node -v
-# Use absolute path to node if available
-NODE_BIN=$(command -v node)
+
 $NODE_BIN registerOrg1User.js
 $NODE_BIN registerOrg2User.js
+
+echo "✅ Smart contract deployment and user registration complete!"
