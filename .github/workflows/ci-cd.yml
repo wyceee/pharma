@@ -70,7 +70,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
             docker-compose down || true
             docker-compose up -d --build
-            chmod +x start-fabric.sh
-            start-fabric.sh
-            chmod +x deploy-contract.sh
-            deploy-contract.sh
+            chmod +x ./start-fabric.sh
+            ./start-fabric.sh
+            chmod +x ./deploy-contract.sh
+            ./deploy-contract.sh
