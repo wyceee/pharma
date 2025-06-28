@@ -15,5 +15,5 @@ cd fabric-samples/test-network
 
 # Register users for Org1 and Org2
 cd ../../backend/node
-node node/registerOrg1User.js
-node node/registerOrg2User.js
+node registerOrg1User.js
+node registerOrg2User.js
