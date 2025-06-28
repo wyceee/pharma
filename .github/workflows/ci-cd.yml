@@ -64,29 +64,57 @@ jobs:
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            apt-get remove -y nodejs
+            echo "🧹 Removing old nodejs and conflicting packages..."
+            apt-get remove -y nodejs libnode-dev
+
+            echo "🔄 Updating package lists..."
             apt update
+
+            echo "📦 Setting up Node.js 18 repository..."
             curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+
+            echo "📥 Installing Node.js..."
             apt-get install -y nodejs
+
+            echo "🔗 Creating node symlinks for compatibility..."
             ln -sf /usr/local/bin/node /usr/bin/node || true
             ln -sf /usr/local/bin/node /usr/bin/nodejs || true
+
             export PATH=/usr/local/bin:/usr/bin:/bin:$PATH
+            echo "✅ Node version:"
             node -v
 
+            echo "📁 Cloning or navigating to /root/pharma repository..."
             cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
+
+            echo "🧹 Cleaning local changes to avoid git conflicts..."
+            git reset --hard
+            git clean -fd
+
+            echo "⬇️ Pulling latest code..."
             git pull
 
+            echo "🐳 Pulling latest backend Docker image..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+
+            echo "🐳 Pulling latest frontend Docker image..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
 
+            echo "🛑 Stopping existing Docker containers..."
             docker-compose down || true
+
+            echo "🚀 Starting Docker containers with new images..."
             docker-compose up -d --build
 
-            # Delete wallet before starting fabric network
+            echo "🗑️ Deleting backend/node/wallet directory to reset Fabric identities..."
             rm -rf backend/node/wallet
 
+            echo "⚙️ Starting Fabric network..."
             chmod +x ./start-fabric.sh
             ./start-fabric.sh
 
+            echo "⚙️ Deploying smart contract and registering users..."
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
+
+            echo "🎉 Deployment complete!"
