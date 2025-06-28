@@ -18,5 +18,8 @@ cd fabric-samples/test-network
 
 # Register users for Org1 and Org2
 cd ../../backend/node
+which node
+echo $PATH
+node -v
 node registerOrg1User.js
 node registerOrg2User.js
