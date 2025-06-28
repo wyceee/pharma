@@ -94,22 +94,14 @@ jobs:
             echo "⬇️ Pulling latest code..."
             git pull
 
-            echo "🐳 Pulling latest backend Docker image..."
+            echo "🐳 Pulling latest Docker images (optional if using images)..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
-
-            echo "🐳 Pulling latest frontend Docker image..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
-
-            echo "🛑 Stopping existing Docker containers..."
-            docker-compose down || true
-
-            echo "🚀 Starting Docker containers with new images..."
-            docker-compose up -d --build
 
             echo "🗑️ Deleting backend/node/wallet directory to reset Fabric identities..."
             rm -rf backend/node/wallet
 
-            echo "⚙️ Starting Fabric network..."
+            echo "⚙️ Starting Hyperledger Fabric network..."
             chmod +x ./start-fabric.sh
             ./start-fabric.sh
 
@@ -117,4 +109,17 @@ jobs:
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
 
-            echo "🎉 Deployment complete!"
+            echo "🚀 Starting frontend and backend containers..."
+            docker-compose down || true
+            docker-compose up -d --build
+
+            echo "🔎 Showing running Docker containers..."
+            docker ps
+
+            echo "📄 Backend logs (last 30 lines):"
+            docker logs pharma-backend --tail=30 || true
+
+            echo "📄 Frontend logs (last 30 lines):"
+            docker logs pharma-frontend --tail=30 || true
+
+            echo "🎉 Deployment complete! 🎉"
