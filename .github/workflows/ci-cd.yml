@@ -64,6 +64,8 @@ jobs:
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            apt update
+            apt install -y nodejs npm
             cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
             git pull
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
@@ -72,5 +74,8 @@ jobs:
             docker-compose up -d --build
             chmod +x ./start-fabric.sh
             ./start-fabric.sh
+            cd backend
+            npm install
+            cd ..
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
