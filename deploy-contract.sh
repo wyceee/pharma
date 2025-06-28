@@ -4,7 +4,6 @@
 set -e
 
 cd fabric-samples/test-network
-./network.sh up createChannel -c pharmachannel -ca
 
 
 # Deploy the chaincode
