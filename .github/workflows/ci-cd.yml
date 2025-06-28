@@ -68,6 +68,10 @@ jobs:
             apt update
             curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
             apt-get install -y nodejs
+            # Ensure both 'node' and 'nodejs' commands are available
+            ln -sf /usr/bin/node /usr/bin/nodejs || true
+            ln -sf /usr/bin/nodejs /usr/bin/node || true
+            export PATH=$PATH:/usr/bin
             node -v
             cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
             git pull
