@@ -1,12 +1,11 @@
 #!/bin/bash
-# deploy-contract.sh
-# Script to deploy the pharma chaincode and register users as in the README
-set -e
+set -ex
 
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 
 cd fabric-samples/test-network
-
+pwd
+ls -l
 
 # Deploy the chaincode
 ./network.sh deployCC \
@@ -16,8 +15,9 @@ cd fabric-samples/test-network
   -c pharmachannel \
   -ccv 1
 
-# Register users for Org1 and Org2
 cd ../../backend/node
+pwd
+ls -l
 which node
 echo $PATH
 node -v
