@@ -11,7 +11,7 @@
         </p>
         <div class="hero-buttons">
           <button class="btn primary" @click="goToLogin">Login</button>
-          <button class="btn secondary">View Repository</button>
+          <a class="btn secondary" href="https://github.com/wyceee/pharma" target="_blank" rel="noopener noreferrer">View Repository</a>
         </div>
       </div>
     </div>
