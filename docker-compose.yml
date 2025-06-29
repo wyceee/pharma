@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   backend:
-    build: ./backend
+    image: ${DOCKERHUB_USERNAME}/pharma-backend:latest
     container_name: pharma-backend
     ports:
       - "3000:3000"
@@ -11,7 +11,7 @@ services:
       - pharmanet
 
   frontend:
-    build: ./frontend
+    image: ${DOCKERHUB_USERNAME}/pharma-frontend:latest
     container_name: pharma-frontend
     ports:
       - "80:80"
