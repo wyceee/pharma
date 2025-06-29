@@ -85,3 +85,4 @@ jobs:
             nohup serve -s frontend/dist -l 80 & disown
 
             echo "🎉 Deployment complete! 🎉"
+            exit 0
