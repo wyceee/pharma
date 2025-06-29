@@ -50,8 +50,9 @@ jobs:
             git clean -fd
             git pull
 
-            echo "📦 Installing Node.js if needed..."
-            if ! node -v | grep "v18"; then
+            echo "📦 Checking Node.js version..."
+            node_major=$(node -v | cut -d. -f1 | tr -d 'v')
+            if [ "$node_major" -ne 18 ]; then
               curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
               apt-get install -y nodejs
             fi
@@ -80,6 +81,9 @@ jobs:
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
 
+            echo "🔑 Writing backend .env file..."
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > /root/pharma/backend/.env
+
             echo "📦 Installing serve..."
             npm install -g serve
 
@@ -87,10 +91,9 @@ jobs:
             fuser -k 80/tcp || true
 
             echo "🌐 Serving frontend on port 80..."
-            nohup serve -s frontend/dist -l 80 & disown
+            nohup serve -s frontend/dist -l 80 > frontend.log 2>&1 &
 
-            echo "🔑 Writing backend .env file with SECRET_KEY..."
-            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > /root/pharma/backend/.env
+            echo "🚀 Starting backend server..."
+            nohup npm --prefix backend start > backend.log 2>&1 &
 
             echo "🎉 Deployment complete! 🎉"
-            exit 0
