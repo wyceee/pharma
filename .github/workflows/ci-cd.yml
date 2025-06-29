@@ -9,38 +9,24 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:20.10.16-dind
-        options: --privileged
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build backend image
-        run: docker build -t pharma-backend backend
-
-      - name: Build frontend image
-        run: docker build -t pharma-frontend frontend
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          node-version: 18
 
-      - name: Tag and push backend image
+      - name: Install backend dependencies
         run: |
-          docker tag pharma-backend ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
+          cd backend
+          npm install
 
-      - name: Tag and push frontend image
+      - name: Install frontend dependencies
         run: |
-          docker tag pharma-frontend ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+          cd frontend
+          npm install
 
       - name: Deploy on remote server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -49,30 +35,6 @@ jobs:
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            echo "🧹 Removing old nodejs and conflicting packages..."
-            apt-get remove -y nodejs libnode-dev
-
-            echo "🧹 Stopping and removing all Docker containers..."
-            docker ps -aq | xargs -r docker stop
-            docker ps -aq | xargs -r docker rm
-
-            echo "🔄 Updating package lists..."
-            apt update
-
-            echo "📦 Setting up Node.js 18 repository..."
-            curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-
-            echo "📥 Installing Node.js..."
-            apt-get install -y nodejs
-
-            echo "🔗 Creating node symlinks for compatibility..."
-            ln -sf /usr/local/bin/node /usr/bin/node || true
-            ln -sf /usr/local/bin/node /usr/bin/nodejs || true
-
-            export PATH=/usr/local/bin:/usr/bin:/bin:$PATH
-            echo "✅ Node version:"
-            node -v
-
             echo "📁 Cloning or navigating to /root/pharma repository..."
             cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
 
@@ -80,42 +42,31 @@ jobs:
             git reset --hard
             git clean -fd
 
-            echo "⬇️ Pulling latest code (excluding frontend and backend)..."
+            echo "⬇️ Pulling latest code..."
             git pull
-            rm -rf frontend backend
 
-            echo "🐳 Pulling latest Docker images..."
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
+            echo "📦 Installing backend dependencies..."
+            cd backend && npm install && cd ..
 
-            # Set Docker Hub username for docker-compose
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            echo "📦 Installing frontend dependencies..."
+            cd frontend && npm install && cd ..
 
-            echo "🗑️ Deleting backend/node/wallet directory to reset Fabric identities..."
-            rm -rf backend/node/wallet
+            echo "📦 Building frontend for production..."
+            cd frontend && npm run build && cd ..
+
+            echo "🧹 Stopping and removing all Docker containers..."
+            docker ps -aq | xargs -r docker stop
+            docker ps -aq | xargs -r docker rm
 
             echo "⚙️ Starting Hyperledger Fabric network..."
             chmod +x ./start-fabric.sh
             ./start-fabric.sh
 
-            echo "📦 Installing backend dependencies..."
+            echo "📦 Installing backend dependencies (post-Fabric start)..."
             cd backend && npm install && cd ..
 
             echo "⚙️ Deploying smart contract and registering users..."
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
-
-            echo "🚀 Starting frontend and backend containers..."
-            docker-compose down || true
-            docker-compose up -d
-
-            echo "🔎 Showing running Docker containers..."
-            docker ps
-
-            echo "📄 Backend logs (last 30 lines):"
-            docker logs pharma-backend --tail=30 || true
-
-            echo "📄 Frontend logs (last 30 lines):"
-            docker logs pharma-frontend --tail=30 || true
 
             echo "🎉 Deployment complete! 🎉"
