@@ -1,0 +1,84 @@
+name: Standard Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Deploy on remote server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "📁 Cloning or navigating to /root/pharma repository..."
+            if [ -d /root/pharma ]; then
+              cd /root/pharma
+            else
+              git clone https://github.com/${{ github.repository }} /root/pharma
+              cd /root/pharma
+            fi
+
+            echo "🧹 Cleaning local changes..."
+            git reset --hard
+            git clean -fd
+            git pull
+
+            echo "📦 Checking Node.js version..."
+            node_major=$(node -v | cut -d. -f1 | tr -d 'v')
+            if [ "$node_major" -ne 18 ]; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+              apt-get install -y nodejs
+            fi
+
+            echo "📦 Installing backend dependencies..."
+            cd backend && npm install && cd ..
+
+            echo "📦 Installing frontend dependencies..."
+            cd frontend && npm install && cd ..
+
+            echo "⚙️ Building frontend for production..."
+            cd frontend && npm run build && cd ..
+
+            echo "🔑 Writing backend .env file..."
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > /root/pharma/backend/.env
+
+            echo "📦 Installing serve..."
+            npm install -g serve
+
+            echo "🛑 Killing any process on port 80..."
+            fuser -k 80/tcp || true
+
+            echo "🌐 Serving frontend on port 80..."
+            nohup serve -s frontend/dist -l 80 > frontend.log 2>&1 &
+
+            echo "🚀 Starting backend server..."
+            nohup npm --prefix backend start > /root/pharma/backend/backend.log 2>&1 &
+
+            echo "🎉 Deployment complete! 🎉"

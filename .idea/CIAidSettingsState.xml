@@ -4,6 +4,7 @@
     <option name="yamlToUserMarkings">
       <map>
         <entry key="$PROJECT_DIR$/.github/workflows/ci-cd.yml" value="true" />
+        <entry key="$PROJECT_DIR$/.github/workflows/standard-deployment.yml" value="true" />
       </map>
     </option>
   </component>

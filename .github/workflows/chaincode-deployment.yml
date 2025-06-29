@@ -1,10 +1,12 @@
-name: CI/CD Pipeline
+name: Chaincode Deployment (CCC) Pipeline
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      approve:
+        description: 'Approve deployment? (ONLY IF YOU CHANGED `pharmaContract.js` OR FABRIC DEPLOYMENT SHELLS'
+        required: true
+        default: 'yes'
 
 jobs:
   build-and-deploy:
@@ -69,6 +71,9 @@ jobs:
             echo "🛑 Stopping and removing all Docker containers..."
             docker ps -aq | xargs -r docker stop
             docker ps -aq | xargs -r docker rm
+
+            echo "🗑️ Removing wallet directory in backend/node..."
+            rm -rf backend/node/wallet
 
             echo "⚙️ Starting Hyperledger Fabric network..."
             chmod +x ./start-fabric.sh
