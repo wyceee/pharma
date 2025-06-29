@@ -45,6 +45,9 @@ jobs:
             echo "⬇️ Pulling latest code..."
             git pull
 
+            echo "🧹 Removing old nodejs and conflicting packages..."
+            apt-get remove -y nodejs libnode72 || true
+
             echo "📦 Installing Node.js and npm..."
             curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
             apt-get install -y nodejs
