@@ -26,21 +26,6 @@ jobs:
       - name: Build frontend image
         run: docker build -t pharma-frontend frontend
 
-      - name: Build and start Fabric network
-        run: |
-          chmod +x ./start-fabric.sh
-          ./start-fabric.sh
-
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          npm install
-
-      - name: Deploy smart contract
-        run: |
-          chmod +x ./deploy-contract.sh
-          ./deploy-contract.sh
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -67,6 +52,10 @@ jobs:
             echo "🧹 Removing old nodejs and conflicting packages..."
             apt-get remove -y nodejs libnode-dev
 
+            echo "🧹 Stopping and removing all Docker containers..."
+            docker ps -aq | xargs -r docker stop
+            docker ps -aq | xargs -r docker rm
+
             echo "🔄 Updating package lists..."
             apt update
 
@@ -91,10 +80,11 @@ jobs:
             git reset --hard
             git clean -fd
 
-            echo "⬇️ Pulling latest code..."
+            echo "⬇️ Pulling latest code (excluding frontend and backend)..."
             git pull
+            rm -rf frontend backend
 
-            echo "🐳 Pulling latest Docker images (optional if using images)..."
+            echo "🐳 Pulling latest Docker images..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
 
@@ -104,6 +94,9 @@ jobs:
             echo "⚙️ Starting Hyperledger Fabric network..."
             chmod +x ./start-fabric.sh
             ./start-fabric.sh
+
+            echo "📦 Installing backend dependencies..."
+            cd backend && npm install && cd ..
 
             echo "⚙️ Deploying smart contract and registering users..."
             chmod +x ./deploy-contract.sh
