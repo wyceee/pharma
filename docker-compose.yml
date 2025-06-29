@@ -9,6 +9,8 @@ services:
       - NODE_ENV=production
     networks:
       - pharmanet
+    volumes:
+      - ./backend/node/wallet:/app/node/wallet
 
   frontend:
     image: ${DOCKERHUB_USERNAME}/pharma-frontend:latest
