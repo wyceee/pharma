@@ -225,6 +225,7 @@ const goToLogin = () => {
 .btn.secondary {
   border: 1px solid #d1d5db;
   color: #374151;
+  background-color: #fff;
 }
 
 .btn.secondary:hover {
