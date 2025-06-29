@@ -83,6 +83,7 @@ jobs:
             fuser -k 80/tcp || true
 
             echo "🌐 Serving frontend on port 80..."
-            nohup serve -s frontend/dist -l 80 &
+            nohup serve -s frontend/dist -l 80 & disown
 
             echo "🎉 Deployment complete! 🎉"
+            exit 0
