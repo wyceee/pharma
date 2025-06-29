@@ -45,6 +45,10 @@ jobs:
             echo "⬇️ Pulling latest code..."
             git pull
 
+            echo "📦 Installing Node.js and npm..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+            apt-get install -y nodejs
+
             echo "📦 Installing backend dependencies..."
             cd backend && npm install && cd ..
 
