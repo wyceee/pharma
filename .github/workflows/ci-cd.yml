@@ -28,6 +28,20 @@ jobs:
           cd frontend
           npm install
 
+      - name: Build frontend for production
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Copy frontend dist to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "frontend/dist/*"
+          target: "/root/pharma/frontend/dist/"
+
       - name: Deploy on remote server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -57,9 +71,6 @@ jobs:
 
             echo "📦 Installing frontend dependencies..."
             cd frontend && npm install && cd ..
-
-            echo "📦 Building frontend for production..."
-            cd frontend && npm run build && cd ..
 
             echo "🧹 Stopping and removing all Docker containers..."
             docker ps -aq | xargs -r docker stop
