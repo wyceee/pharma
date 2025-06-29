@@ -38,7 +38,12 @@ jobs:
             set -e
 
             echo "📁 Cloning or navigating to /root/pharma repository..."
-            cd /root/pharma || (git clone https://github.com/${{ github.repository }} /root/pharma && cd /root/pharma)
+            if [ -d /root/pharma ]; then
+              cd /root/pharma
+            else
+              git clone https://github.com/${{ github.repository }} /root/pharma
+              cd /root/pharma
+            fi
 
             echo "🧹 Cleaning local changes..."
             git reset --hard
