@@ -84,5 +84,8 @@ jobs:
             echo "🌐 Serving frontend on port 80..."
             nohup serve -s frontend/dist -l 80 & disown
 
+            echo "🔑 Writing backend .env file with SECRET_KEY..."
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > /root/pharma/backend/.env
+
             echo "🎉 Deployment complete! 🎉"
             exit 0
