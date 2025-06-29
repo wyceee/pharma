@@ -76,4 +76,13 @@ jobs:
             chmod +x ./deploy-contract.sh
             ./deploy-contract.sh
 
+            echo "📦 Installing serve to host frontend on port 80..."
+            npm install -g serve
+
+            echo "🛑 Killing any process using port 80..."
+            fuser -k 80/tcp || true
+
+            echo "🌐 Serving frontend on port 80..."
+            nohup serve -s frontend/dist -l 80 &
+
             echo "🎉 Deployment complete! 🎉"
