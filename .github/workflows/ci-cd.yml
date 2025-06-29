@@ -88,6 +88,9 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pharma-frontend:latest
 
+            # Set Docker Hub username for docker-compose
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+
             echo "🗑️ Deleting backend/node/wallet directory to reset Fabric identities..."
             rm -rf backend/node/wallet
 
@@ -104,7 +107,7 @@ jobs:
 
             echo "🚀 Starting frontend and backend containers..."
             docker-compose down || true
-            docker-compose up -d --build
+            docker-compose up -d
 
             echo "🔎 Showing running Docker containers..."
             docker ps
