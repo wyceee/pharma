@@ -94,6 +94,6 @@ jobs:
             nohup serve -s frontend/dist -l 80 > frontend.log 2>&1 &
 
             echo "🚀 Starting backend server..."
-            nohup npm --prefix backend start > backend.log 2>&1 &
+            nohup npm --prefix backend start > /root/pharma/backend/backend.log 2>&1 &
 
             echo "🎉 Deployment complete! 🎉"
