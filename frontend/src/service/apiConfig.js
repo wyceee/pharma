@@ -1,5 +1,3 @@
-//CHANGE THIS FILE TO CONFIGURE THE API URL
-
 function isLocalEnv() {
   // Checks if running on localhost or 127.0.0.1
   if (typeof window !== 'undefined') {
