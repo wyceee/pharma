@@ -66,6 +66,11 @@ cd pharma
 cd backend
 npm install
 ```
+#### Contract
+```sh
+cd contract
+npm install
+```
 #### Frontend
 ```sh
 cd frontend
