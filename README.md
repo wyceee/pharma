@@ -98,15 +98,22 @@ docker ps                    # Make sure Docker is running
 cd ../../backend/node
 node registerOrg1User.js
 node registerOrg2User.js
- ```
+```
 
-### 5. Start Backend Server
+### 5. Generate Backend .env File
+Create a `.env` file in the `backend` directory with the following content:
+
+```env
+SECRET_KEY=<get_this_from_admin>
+```
+
+### 6. Start Backend Server
 ```sh
 cd backend
 node server.js
 ```
 
-### 6. Start Frontend
+### 7. Start Frontend
 ```sh
 cd frontend
 npm run dev
@@ -118,6 +125,7 @@ npm run dev
 - Access the frontend at [http://localhost:5173](http://localhost:5173)
 - Log in as a manufacturer or distributor
 - Add products, ship them, and track their status
+- Check the docker logs for tx output
 
 ---
 
