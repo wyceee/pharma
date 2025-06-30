@@ -1,4 +1,8 @@
-# Pharmacy Supply Chain on Hyperledger Fabric
+<p align="center">
+  <img src="frontend/src/assets/Pharma.png" alt="PharmaChain Logo" width="200"/>
+</p>
+
+# 🌐[Live demo](https://pharmachain-hva.xyz)
 
 A full-stack blockchain application for tracking pharmaceutical products through the supply chain, built on Hyperledger Fabric. This project demonstrates secure, transparent, and auditable product movement from manufacturer to distributor using smart contracts, a Node.js backend, and a Vue 3 frontend.
 
@@ -7,18 +11,13 @@ A full-stack blockchain application for tracking pharmaceutical products through
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture](#architecture)
+- [Project Structure](#project-structure)
 - [Features](#features)
-- [Tech Stack](#tech-stack)
 - [Setup & Installation](#setup--installation)
 - [Usage](#usage)
 - [Smart Contract](#smart-contract)
 - [Backend API](#backend-api)
 - [Frontend](#frontend)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
 ---
 
 ## Overview
@@ -29,6 +28,17 @@ This project simulates a pharmaceutical supply chain, allowing manufacturers to 
 - **Backend (Node.js/Express):** REST API server that interacts with the chaincode and manages authentication.
 - **Frontend (Vue 3):** User interface for manufacturers and distributors to manage products and shipments.
 
+## Project Structure
+```
+pharma/
+├── .github/         # GitHub Actions CI/CD workflows for automated deployment & network hosting
+├── backend/         # Node.js/Express API server
+├── contract/        # Hyperledger Fabric chaincode
+├── frontend/        # Vue 3 frontend
+├── fabric-samples/  # Hyperledger Fabric test network
+└── README.md
+```
+
 ## Features
 - Register new pharmaceutical products (manufacturer)
 - Ship products to distributors
@@ -36,20 +46,13 @@ This project simulates a pharmaceutical supply chain, allowing manufacturers to 
 - Role-based authentication (manufacturer/distributor)
 - Blockchain-backed audit trail
 - Responsive, modern UI
-
-## Tech Stack
-- **Blockchain:** Hyperledger Fabric
-- **Smart Contract:** JavaScript (pharmaContract.js)
-- **Backend:** Node.js, Express
-- **Frontend:** Vue 3, Vite, TypeScript
-- **Database:** Blockchain ledger (no off-chain DB)
+- CI/CD pipelines for automated deployment on a hosted environment
 
 ## Setup & Installation
 ### Prerequisites
 - Node.js (v16+ recommended)
-- npm or yarn
+- npm
 - Docker & Docker Compose
-- Hyperledger Fabric samples (included as submodule/folder)
 
 ### 1. Clone the Repository
 ```sh
@@ -77,42 +80,33 @@ curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/ins
 
 ### 4. Deploy Smart Contract
 ```bash
-# 1️⃣ Bring up the test network and create the channel
+# Bring up the test network and create the channel
 cd fabric-samples/test-network
-docker ps                      # Ensure Docker is running
-./network.sh down              # (Optional) Tear down any old network
+docker ps                    # Make sure Docker is running
+./network.sh down            # (Optional) Remove any old network
 ./network.sh up createChannel -c pharmachannel -ca
 
-# 2️⃣ Deploy the chaincode
-# This works for Org1 and Org2 in the official test network
-# Adjust the path and names accordingly
+# Deploy chaincode
 ./network.sh deployCC \
--ccn pharma \
--ccp ../../contract \
--ccl javascript \
--c pharmachannel \
--ccv 1
-        
-# 3️⃣ Register users for the available organizations
-# (Org1 and Org2 only, using official test-network connections.)
+  -ccn pharma \
+  -ccp ../../contract \
+  -ccl javascript \
+  -c pharmachannel \
+  -ccv 1
+
+# Register application users
 cd ../../backend/node
 node registerOrg1User.js
 node registerOrg2User.js
  ```
 
-### 5. **(Optional) Reset the Hyperledger Fabric network**:
-```bash
-cd fabric-samples/test-network
-./network.sh down
-```
-
-### 6. Start Backend Server
+### 5. Start Backend Server
 ```sh
 cd backend
 node server.js
 ```
 
-### 7. Start Frontend
+### 6. Start Frontend
 ```sh
 cd frontend
 npm run dev
@@ -122,7 +116,7 @@ npm run dev
 
 ## Usage
 - Access the frontend at [http://localhost:5173](http://localhost:5173)
-- Register as a manufacturer or distributor
+- Log in as a manufacturer or distributor
 - Add products, ship them, and track their status
 
 ---
@@ -131,6 +125,7 @@ npm run dev
 - Located in `contract/pharmaContract.js`
 - Handles product registration, shipment, and verification
 - Implements chaincode interface for Hyperledger Fabric
+- `contactservice.js` in the backend provides utility functions for interacting with the chaincode
 
 ## Backend API
 - Located in `backend/`
@@ -147,32 +142,7 @@ npm run dev
   - `Product.vue` - Product registration
   - `Shipment.vue` - Shipping products
   - `Dashboard.vue` - Track and view product status
+  - `Auth.vue` - User authentication
+  - `apiConfig.js` - API configuration for backend calls depending on environment
 
 ---
-
-## Testing
-- Backend test scripts in `backend/test/`
-- Smart contract tests in `contract/test/`
-- Use Postman or the frontend UI to test API endpoints
-
----
-
-## Project Structure
-```
-pharma/
-├── backend/         # Node.js/Express API server
-├── contract/        # Hyperledger Fabric chaincode
-├── frontend/        # Vue 3 frontend
-├── fabric-samples/  # Hyperledger Fabric test network
-└── README.md
-```
-
----
-
-## Contributing
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
-
----
-
-## License
-[MIT](LICENSE)
